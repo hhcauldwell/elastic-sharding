@@ -46,12 +46,20 @@ class Cluster:
         return self.allocations.get(self.name, None)
 
     @property
+    def is_leader(self):
+        return self.shard == 0
+
+    @property
+    def root_path(self):
+        return "/elastic-cluster"
+
+    @property
     def party_path(self):
-        return "/elastic-cluster/party"
+        return "/".join([self.root_path, "party"])
 
     @property
     def gate_path(self):
-        return "/elastic-cluster/gate"
+        return "/".join([self.root_path, "gate"])
 
     async def ready(self):
         if self.shard is None:
@@ -67,13 +75,13 @@ class Cluster:
             self.gate_path,
             len(self.party.members)
         )
-        await gate.enter()
-
-        new_allocations = {m: i for i, m in enumerate(self.party.members)}
         try:
-            new_members = self.party.members.copy()
-            new_members.sort()
-            new_allocations = {m: i for i, m in enumerate(new_members)}
+            await gate.enter()
+            new_allocations = {m: i for i, m in enumerate(self.party.members)}
+            # TODO: Might be smart to contact the leader and verify
+            # allocations before proceeding the leave the gate. That
+            # way all of the followers must have the same allocations
+            # as the leader for the leader to close the gate.
         finally:
             await gate.leave()
 
