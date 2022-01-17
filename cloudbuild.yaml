@@ -1,17 +1,17 @@
 steps:
 - name: gcr.io/cloud-builders/gcloud
-  args: ["builds", "submit", "--pack", "image=gcr.io/$PROJECT_ID/elastic-cluster:$BRANCH_NAME"]
+  args: ["builds", "submit", "--pack", "image=gcr.io/$PROJECT_ID/$_SERICE:$BRANCH_NAME"]
 - name: gcr.io/cloud-builders/gcloud
   args:
   - run
   - deploy
-  - elastic-cluster
-  - --image=gcr.io/$PROJECT_ID/elastic-cluster:$BRANCH_NAME
+  - $_SERVICE
+  - --image=gcr.io/$PROJECT_ID/$_SERVICE:$BRANCH_NAME
   - --region=us-central1
   - --revision-suffix=$SHORT_SHA
  #- --no-traffic
-  - --cpu=1
-  - --memory=1G
-  - --min-instances=1
-  - --max-instances=10
+  - --cpu=$_CPUS
+  - --memory=$_MEMORY
+  - --min-instances=$_MIN_INSTANCES
+  - --max-instances=$_MAX_INSTANCES
   - --allow-unauthenticated
