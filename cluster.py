@@ -47,11 +47,11 @@ class Cluster:
 
     @property
     def party_path(self):
-        return "/sec/party"
+        return "/elastic-cluster/party"
 
     @property
     def gate_path(self):
-        return "/sec/gate"
+        return "/elastic-cluster/gate"
 
     async def ready(self):
         if self.shard is None:
