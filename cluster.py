@@ -131,5 +131,6 @@ class Cluster:
                 self.party.base_path,
                 self.trigger_rebalance,
             )
+            await self.party.leave()
         self.stop_rebalance()
         await self.zk.close()
