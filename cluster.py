@@ -29,7 +29,6 @@ class Cluster:
 
         self.zk = ZKClient(self.zk_servers)
 
-        self.shard = None
         self.party = None
         self.allocations = dict()
 
@@ -41,6 +40,10 @@ class Cluster:
         self.on_rebalance_end = Signal(self)
         self.on_rebalance_end.append(on_rebalance_end)
         self.on_rebalance_end.freeze()
+
+    @property
+    def shard(self):
+        return self.allocations.get(self.name, None)
 
     @property
     def party_path(self):
@@ -56,7 +59,6 @@ class Cluster:
         await self.zk.get("/")
 
     async def rebalance(self):
-        self.shard = None
         self.allocations.clear()
 
         await self.on_rebalance_start.send()
@@ -75,8 +77,6 @@ class Cluster:
         finally:
             await gate.leave()
 
-        self.shard = new_allocations.get(self.name, None)
-        log.warning(self.shard)
         self.allocations = new_allocations
         await self.on_rebalance_end.send(self.shard, self.allocations)
 
